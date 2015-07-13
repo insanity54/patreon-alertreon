@@ -1,0 +1,36 @@
+{
+  "name": "patreon-alertreon",
+  "version": "1.0.0",
+  "description": "patreon alerts for twitch.tv and OBS",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/insanity54/patreon-alertreon"
+  },
+  "keywords": [
+    "twitch.tv",
+    "patreon"
+  ],
+  "author": "Chris Grimmett <chris@grimtech.net>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/insanity54/patreon-alertreon/issues"
+  },
+  "homepage": "https://github.com/insanity54/patreon-alertreon",
+  "dependencies": {
+    "cheerio": "^0.19.0",
+    "express": "^4.13.1",
+    "mocha": "^2.2.5",
+    "nconf": "^0.7.1",
+    "request": "^2.58.0",
+    "selenium-webdriver": "^2.46.1",
+    "socket.io": "^1.3.5"
+  },
+  "devDependencies": {
+    "chai": "^3.0.0",
+    "mocha": "^2.2.5"
+  }
+}
