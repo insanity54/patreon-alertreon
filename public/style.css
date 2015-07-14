@@ -25,6 +25,7 @@ body {
 
 #introHeading {
     font-size: 20px;
+    font-family: "Lobster", cursive;
 }
 
 #intro, #status, #patreonAccount {
@@ -45,4 +46,8 @@ body {
 
 .buffer-lg {
     min-height: 200px;
+}
+
+#flashes {
+    display: none;
 }

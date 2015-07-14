@@ -1,47 +1,36 @@
-var express = require('express');
-var app = express();
-var server = require('http').Server(app);
-var io = require('socket.io')(server);
-var path = require('path');
+var storage = require('./database/datastore');
 
 
-server.listen(process.env.PORT);
+var startCrawl = function startCrawl(patreonUsername, cb) {
+    console.log('crawling user', patreonUsername);
+    return cb(null);
+};
 
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.get('/', function(req, res) {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-
-io.on('connection', function(socket) {
-    console.log('connection ');
-    socket.emit('news', {
-        status: 'world'
+var receivePatreonUsername = function getPatreonUsername(patreonUsername, cb) {
+    // See if it already exists in database
+    storage.checkUserExists(patreonUsername, function(err, exists) {
+        if (err) throw err;
+        if (exists === 0) return cb(null, false);
+        startCrawl(patreonUsername, function(err) {
+            if (err) throw err;
+            return cb(null, true);
+        });
     });
-    // socket.on('my other event', function(data) {
-    //     console.log(data);
-    // });
-});
 
+
+// if new
+    //   que initial crawl
+
+// if old
+//   do nothing
+
+};
+
+var status = 0;
 
 
 module.exports = {
-    startCrawl: function startCrawl(patreonUsername) {
-
-    },
-
-    receivePatreonUsername: function getPatreonUsername(patreonUsername) {
-	// See if it already exists in database
-	// if new
-        //   que initial crawl
-
-	// if old
-	//   do nothing
-	
-    }
-
-    
-
-    
-}
+	startCrawl: startCrawl,
+	receivePatreonUsername: receivePatreonUsername,
+	status: status
+};
