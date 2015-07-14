@@ -1,3 +1,48 @@
 body {
     background-color: #7178b8;
 }
+
+.line {
+    border-top: 1px dashed orange;
+}
+
+#status {
+    border: 1px dotted pink;
+    min-height: 25px;
+    max-width: 200px;
+}
+
+#nojavascript {
+    font-weight: bold;
+    font-size: 50px;
+}
+
+#nameInputHeading
+#statusHeading
+#patreonAccountHeading {
+    font-weight: bold;
+}
+
+#introHeading {
+    font-size: 20px;
+}
+
+#intro, #status, #patreonAccount {
+    margin-bottom: 20px;
+}
+
+#introContent, #statusContent, #patreonAccountContent {
+    
+}
+
+.buffer-sm {
+    min-height: 25px;
+}
+
+.buffer-md {
+    min-height: 100px;
+}
+
+.buffer-lg {
+    min-height: 200px;
+}

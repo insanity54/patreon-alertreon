@@ -4,17 +4,104 @@
     <title>Alertreon</title>
     <link rel="stylesheet" href="/style.css">
 </head>
+
 <body>
-    <h3>Alertreon</h3>
-    
-    <div id="status">
+
+    <noscript>
+        <div id="nojavascript">
+            Your browser does not support JavaScript! Alertreon requires it.
+        </div>
+    </noscript>
+
+
+
+    <!-- intro -->
+    <div id="intro">
+        <div id="introHeading">
+            Alertreon
+        </div>
+        <div id="introContent">
+            Alertreon is an easy way generate an alert when someone pledges to your Patreon page! The alert can be used with twitch.tv to show notifications in your stream.
+        </div>
     </div>
+
+
+
+
+    <!-- server status section -->
+    <div id="status">
+        <div id="statusHeading">
+            Server status
+        </div>
+        <div id="statusContent">
+            unknown
+        </div>
+    </div>
+    <br>
     
+    
+    
+    <!-- Section showing your linked Patreon account -->
+    <div id="patreonAccount">
+        <div id="patreonAccountHeading">
+            Your patreon account
+        </div>
+        <div id="patreonAccountContent">
+            n/a
+        </div>
+    </div>
+    <br>
+
+
+
+    <!-- Patreon account input box -->
+    <div id="nameInput">
+        <div id="nameInputHeading">Enter your Patreon username!</div>
+        <div id="nameInputContent">
+            <div class="input-group">
+                <span class="input-group-addon" id="basic-addon1">https://www.patreon.com/</span>
+                <input type="text" id="patreonUsername" class="form-control" placeholder="Username" aria-describedby="basic-addon1">
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="button" id="submitPatreonUsername">Go!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- buffer space -->
+    <div class="buffer-sm"></div>
+    <div class="line"></div>
+    
+    
+    
+    
+    <!-- Comments/Feedback -->
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES * * */
+        var disqus_shortname = 'alertreontv';
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+
+    <!-- Scriptamundos -->
+    <script src="/zepto.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/socket.js"></script>
     <script src="/updater.js"></script>
-    
-    
+
+
 
 </body>
 
