@@ -4,6 +4,7 @@ var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var path = require('path');
 
+
 server.listen(process.env.PORT);
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -22,3 +23,25 @@ io.on('connection', function(socket) {
     //     console.log(data);
     // });
 });
+
+
+
+module.exports = {
+    startCrawl: function startCrawl(patreonUsername) {
+
+    },
+
+    receivePatreonUsername: function getPatreonUsername(patreonUsername) {
+	// See if it already exists in database
+	// if new
+        //   que initial crawl
+
+	// if old
+	//   do nothing
+	
+    }
+
+    
+
+    
+}
