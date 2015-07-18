@@ -11,6 +11,34 @@ var red = redis.createClient();
 
 
 module.exports = {
+
+    /**
+     * detect whether pledge is new or a re-pledge
+     */
+    detectCreatorPatronType: function detectCreatorPatronType(creatorName, patronId, cb) {
+	red.SISMEMBER('patreon:'+creatorName+':patronsAllTime', patronId, function(err, reply) {
+	    if (err) throw err;
+	    if (reply === 1) {
+		// new patron!
+		return cb(null, 'new');
+	    }
+
+	    red.SISMEMBER('patreon:'+creatorName+':patronsCurrent', patronId, function(err, reply) {
+		if (err) throw err;
+		if (reply === 1) {
+		    return cb(null, 'renew');
+		}
+	    });
+	});
+
+		      
+    },
+
+
+
+
+
+    
     checkUserExists: function checkUserExists(id, cb) {
         red.SISMEMBER('users', id, function(err, reply) {
             if (err) return cb(err, null);
