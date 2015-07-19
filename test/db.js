@@ -3,11 +3,15 @@ var path = require('path');
 
 
 
-
+var db = require('../database/datastore');
+var redis = require('redis');
+var red = redis.createClient();
 
 
 describe('Database', function() {
 
+    this.timeout(1000 * 6);
+    
     var db;
     var redis;
     var red;
@@ -21,55 +25,110 @@ describe('Database', function() {
     
     
     beforeEach(function(done) {
-        red.DEL('patreon:__alertreontest:patronsAllTime', function(err) {
-            expect(err).to.equal(null);
-            
-            red.DEL('patreon:__alertreontest:patronsCurrent', function(err) {
-                expect(err).to.equal(null);
-                done();
-            });
-        });        
+    	db.clearTestData(function(err) {
+    	    expect(err).to.be.null;
+    	    done();
+    	});
     });
     
+    
     it('tests should start with clean slate', function(done) {
-        red.EXISTS('patreon:__alertreontest:patronsAllTime', function(err, reply) {
-            expect(reply).to.equal(0);
-            
-            red.EXISTS('patreon:__alertreontest:patronsCurrent', function(err, reply) {
-                expect(reply).to.equal(0);
+	db.clearTestData(function(err) {
+	    expect(err).to.be.null;
+	
+            red.EXISTS('patreon:__alertreontest:patronsAllTime', function(err, reply) {
+		expect(reply).to.equal(0);
+		
+		red.EXISTS('patreon:__alertreontest:patronsCurrent', function(err, reply) {
+                    expect(reply).to.equal(0);
+		    done();
+		});
             });
         });
     });
 
+    
+    it('should add specified patron to the two sets', function(done) {
+	// simulates how patron would be added to db in an initial crawl
+	db.addCreatorPatron('__alertreontest', '__plainjane', function(err, response) {
+	    expect(err).to.equal(null);
+	    expect(response).to.equal(0);
+	    done();
+	});
+    });
+
+
+    it('unpledging should remove a patron from only the current patrons set', function(done) {
+	db.logCreatorPatron('__alertreontest', '__plainjane', function(err, response) {
+	    expect(err).to.equal(null);
+	    expect(response.status).to.equal(0);
+	
+	    db.unpledgeCreatorPatron('__alertreontest', '__plainjane', function(err, response) {
+		expect(err).to.equal(null);
+		expect(response).to.equal(0);
+
+		red.SISMEMBER('patreon:__alertreontest:patronsCurrent', '__plainjane', function(err, isMember) {
+		    expect(err).to.equal(null);
+		    expect(isMember).to.equal(0);
+
+		    red.SISMEMBER('patreon:__alertreontest:patronsAllTime', '__plainjane', function(err, isMember) {
+			expect(err).to.equal(null);
+			expect(isMember).to.equal(1);
+			done();
+		    });
+		});
+	    });
+	});
+    });
+
+
     it('should add a new patron to the database if they\'re new', function(done) {
-        db.logCreatorPatron('__alertreontest', 'newnancy', function(err, response) {
+	// simulates how patrons found during routine checks would be compared to known patrons
+        db.logCreatorPatron('__alertreontest', '__plainpete', function(err, response) {
             expect(err).to.equal(null);
             expect(response.status).to.equal(0);
 
-            red.SISMEMBER('patreon:__alertreontest:patronsAllTime', 'newnancy', function(err, isMember) {
+            red.SISMEMBER('patreon:__alertreontest:patronsAllTime', '__plainpete', function(err, isMember) {
                 expect(err).to.equal(null);
                 expect(isMember).to.equal(1);
-                done();
+
+		red.SISMEMBER('patreon:__alertreontest:patronsCurrent', '__plainpete', function(err, isMember) {
+		    expect(err).to.equal(null);
+		    expect(isMember).to.equal(1);
+                    done();
+		    
+		});
             });
         });
     });
     
     
     it('should detect a new patron', function(done) {
-        db.logCreatorPatron('__alertreontest', 'newnancy', function(err, response) {
-            expect(err).to.equal(null);
-            expect(response.type).to.equal('new');
-            
-            
+	db.getCreatorPatronType('__alertreontest', '__newnancy', function(err, response) {
+	    expect(err).to.equal(null);
+	    expect(response).to.equal('new');
+	    done();
         });
     });
     
-    
+
     it('should detect a returning patron', function(done) {
-        db.logCreatorPatron('__alertreontest', 'rogerresub', function(err, response) {
+	db.logCreatorPatron('__alertreontest', '__rogerresub', function(err, response) {
             expect(err).to.equal(null);
-            expect(response.type).to.equal('renew');
-            done();
-        });
+            expect(response.status).to.equal(0);
+
+	    db.unpledgeCreatorPatron('__alertreontest', '__rogerresub', function(err, response) {
+		expect(err).to.equal(null);
+		expect(response).to.equal(0);
+		
+		db.logCreatorPatron('__alertreontest', '__rogerresub', function(err, response) {
+		    expect(err).to.equal(null);
+		    expect(response.type).to.equal('renew');
+		    done();
+		});	
+	    });
+	});
     });
+
+    
 });
