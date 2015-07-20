@@ -11,13 +11,12 @@ var clearTestData = function clearTestData(cb) {
     red.DEL('patreon:__alertreontest:patronsAllTime', function(err) {
 	if (err) return cb(err);
 	
-        red.DEL('patreon:__alertreontest:patronsCurrent', function(err) {
+	red.DEL('patreon:__alertreontest:patronsCurrent', function(err) {
 	    if (err) return cb(err);
-            return cb(null);
-        });
+	    return cb(null);
+	});
     });
 }
-
 
 
 /**

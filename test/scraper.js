@@ -8,25 +8,33 @@ var request = require('request');
 //var patreon = require('../patreon/patreon');
 
 
-describe('Scraper', function() {
+describe('Patreon', function() {
 
-    this.timeout(1000 * 60 * 20);
+    //this.timeout(1000 * 60 * 20);
 
+    
+    
 
-    it('should get a list of patrons', function(done) {
+    // it('should get a list of patrons', function(done) {
         
-	var patreon = require('../patreon/patreon');
+    // 	var patreon = require('../patreon/index');
 
-	patreon.getCreatorPatrons('pomplamoose', function(err, users) {
-	    if (err) throw err;
-	    console.log(users);
-	});
+    // 	patreon.
+
+    // 	// patreon.getCreatorPatrons('josi', function(err, users) {
+    // 	//     expect(err).to.be.null;
+    // 	//     expect(users).to.be.an('array');
+    // 	//     expect(users.length).to.be.greaterThan(1);
+    // 	//     if (err) throw err;
+    // 	//     console.log(users);
+    // 	// });
+
+	
         
-        
-        // request('https://www.patreon.com/pomplamoose', function(err, res, bod) {
-        //   if (!error && response.statusCode == 200) {
-        //     console.log(body) // Show the HTML
-        //   }
-        //})
-    });
+    //     // request('https://www.patreon.com/pomplamoose', function(err, res, bod) {
+    //     //   if (!error && response.statusCode == 200) {
+    //     //     console.log(body) // Show the HTML
+    //     //   }
+    //     //})
+    // });
 });
