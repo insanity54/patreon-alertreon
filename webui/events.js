@@ -1,6 +1,3 @@
-
-
-
 // var storage = require('./database/datastore');
 
 
@@ -41,29 +38,63 @@
 
 var patreon = require('../patreon/index');
 
+// var patreon = new Patreon('');
 
-module.exports = function events(io) {
+module.exports = function dispatch(io) {
 
     io.on('connection', function(socket) {
-	console.log('connection ');
-	socket.emit('news', {
-            status: dispatch.status
-	});
-	
-	socket.on('newUser', function(data) {
+        console.log('connection ');
+        socket.emit('news', {
+            status: 0
+        });
+
+        socket.on('newUser', function(data) {
             var username = data.username;
             console.log('received user', username);
-            dispatch.receivePatreonUsername(username, function(err, usr) {
-		if (err) throw err;
-		if (usr) {
-                    console.log('this user exists already');
-                    socket.emit('newUser', {response: 0, message: "patreon user already exists on server"});
-		}
-		else {
-                    console.log('this user doesnt exist yet');
-                    socket.emit('newUser', {response: 1, message: "patreon user added to server"});
-		}
+            
+            // detect if patreon user has been crawled before
+            // has been crawled
+            //   redirect ui to widget page
+            //
+            // has not been crawled
+            //   que crawl
+            //   redirect ui to crawl page
+            //
+            //
+            
+            creator = new Patreon(username);
+            
+
+            creator.getCreatorPatrons();
+            
+            creator.on('error', function(err) {
+                
             });
-	});
+            
+            creator.on('end', function(patrons) {
+                
+            });
+            
+            
+            
+            
+            patreon.getCreatorPatrons(username, function(err, usr) {
+                if (err) throw err;
+                if (usr) {
+                    console.log('this user exists already');
+                    socket.emit('newUser', {
+                        response: 0,
+                        message: "patreon user already exists on server"
+                    });
+                }
+                else {
+                    console.log('this user doesnt exist yet');
+                    socket.emit('newUser', {
+                        response: 1,
+                        message: "patreon user added to server"
+                    });
+                }
+            });
+        });
     });
 }
