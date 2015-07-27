@@ -37,6 +37,9 @@
 
 
 var patreon = require('../patreon/index');
+var queue = require('../queue/index');
+var db = require('../database/datastore');
+
 
 // var patreon = new Patreon('');
 
@@ -51,50 +54,33 @@ module.exports = function dispatch(io) {
         socket.on('newUser', function(data) {
             var username = data.username;
             console.log('received user', username);
-            
-            // detect if patreon user has been crawled before
-            // has been crawled
-            //   redirect ui to widget page
-            //
-            // has not been crawled
-            //   que crawl
-            //   redirect ui to crawl page
-            //
-            //
-            
-            creator = new Patreon(username);
-            
 
-            creator.getCreatorPatrons();
-            
-            creator.on('error', function(err) {
-                
-            });
-            
-            creator.on('end', function(patrons) {
-                
-            });
-            
-            
-            
-            
-            patreon.getCreatorPatrons(username, function(err, usr) {
-                if (err) throw err;
-                if (usr) {
-                    console.log('this user exists already');
-                    socket.emit('newUser', {
+            // queue a job to crawl the patreon creator
+            queue.push({
+                creatorName: username
+            }, 5, function(err) {
+                if (err) {
+                    console.error('couldn\'t queue', username, err);
+                    return socket.emit('newUser', {
                         response: 0,
-                        message: "patreon user already exists on server"
+                        message: "problem getting patrons!"
                     });
                 }
-                else {
-                    console.log('this user doesnt exist yet');
-                    socket.emit('newUser', {
+
+                console.log('no errors queueing');
+
+                db.getCreatorPatrons(username, function(err, patrons) {
+                    if (err) throw err;
+                    
+                    console.log('got patrons: ', patrons);
+
+                    return socket.emit('newUser', {
                         response: 1,
-                        message: "patreon user added to server"
+                        message: 'retreived patrons',
+                        patronCount: patrons.length
                     });
-                }
+                });
             });
         });
     });
-}
+};
