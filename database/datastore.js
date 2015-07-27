@@ -1,10 +1,13 @@
 var redis = require('redis');
 var red = redis.createClient();
+var async = require('async');
 
 
-
-// {SET} <id>:patrons       a set containing a creator's patrons
-// {SET} users:<id>         a set containing all users
+// {SET} patreon:<patreonUserName>:patrons              a set containing a creator's patrons
+// {KEY} patreon:<patreonUserName>                      a key containing patreon id (associates aletreon id 
+//                                                      with patreon id)
+// {SET} patreon:<patreonUserName>:patronsCurrent       
+// {SET} alertreon:userIds                              a set containing all user ids (used for alert-box)
 
 
 var clearTestData = function clearTestData(cb) {
@@ -16,7 +19,7 @@ var clearTestData = function clearTestData(cb) {
 	    return cb(null);
 	});
     });
-}
+};
 
 
 /**
@@ -56,7 +59,7 @@ var checkCreatorExists = function checkCreatorExists(id, cb) {
 	if (err) return cb(err);
 	return cb(null, exists);
     });
-}
+};
 
 
 var checkUserExists = function checkUserExists(id, cb) {
@@ -92,7 +95,7 @@ var unpledgeCreatorPatron = function unpledgeCreatorPatron(creatorId, patronId, 
 	if (!ok) return cb(null, 1);
 	return cb(null, 0);
     });
-}
+};
 
 /**
  * @callback {unpledgedCallback}
@@ -126,7 +129,7 @@ var addCreatorPatron = function addCreatorPatron(creatorId, patronId, cb) {
 	    return cb(null, 0);
 	});
     });
-}
+};
 /**
  * @callback {addedPatronCallback}
  * @param {Error} err
@@ -178,7 +181,7 @@ var logCreatorPatron = function logCreatorPatron(creatorId, patronId, cb) {
 	    return cb(null, response);
 	}
     });
-}
+};
 /**
  * loggedCallback
  * 
@@ -190,6 +193,97 @@ var logCreatorPatron = function logCreatorPatron(creatorId, patronId, cb) {
 
 
 
+/**
+ * generateUserId
+ * 
+ * generates a unique user id. a unique alertreon user id.
+ * used for alert URLs like this:
+ * http://alertreon.tv/alert-box/GDG49559DG7J0I8DBE78
+ * generation only. (does not store the string in the database)
+ * 
+ * @param {onGeneratedCallback} cb
+ */
+var generateUserId = function generateUserId(cb) {
+    
+    function genString() {
+        return Math.random().toString(22).slice(2, 22).toUpperCase();
+    }
+
+    function uniqueIdCheck(id, cb) {
+        red.SISMEMBER('alertreon:userIds', id, function(err, isMember) {
+            if (err) throw err;
+            if (isMember) return cb(false); // not unique
+            return cb(1); // unique
+        });
+    }
+
+    async.detect(
+        [genString(), genString(), genString()],
+        uniqueIdCheck,
+        function(result) {
+            if (typeof result === "undefined") return cb(new Error('couldnt get random id'), null);
+            return cb(result);
+        }
+    );
+
+};
+/**
+ * @callback {onGeneratedCallback}
+ * @param {String} id - the unique ID that was generated
+ */
+
+
+
+/**
+ * storeUserId
+ * 
+ * Stores the user id to the database.
+ * associates user id with patreon id.
+ * compliments generateUserId.
+ * 
+ * alertreon:
+ * 
+ * @param {String} alertreonUserId - the alertreon id to store
+ * @param {String} patreonUserId - the patreon user id to associate with
+ * @param {onStoredUserId} cb
+ */
+var storeUserId = function storeUserId(aletreonUserId, patreonUserid, cb) {
+    red.SET('alertreon:' + aletreonUserId, patreonUserid, function(err, ok) {
+        if (err) return cb(err);
+        if (ok !== 'OK') return cb(new Error('Did not get OK message when setting alertreon:users:<alertreonUserId>'));
+        return cb(null);
+    });
+};
+/**
+ * @callback {onStoredUserId}
+ * @param {Error} err
+ */
+
+
+
+
+/**
+ * getCreatorPatrons
+ * 
+ * gets a list of known patrons that are saved in the database.
+ * 
+ * @param {String} patreonUsername
+ * @param {onGotPatrons} cb 
+ */
+var getCreatorPatrons = function getCreatorPatrons(patreonUsername, cb) {
+    red.SMEMBERS('patreon:' + patreonUsername + ':patrons', function(err, members) {
+        if (err) throw err;
+        return cb(null, members);
+    });
+};
+/**
+ * @callback {onGotPatrons}
+ * @param {Error} err
+ * @param {Array} patrons
+ */
+
+
+
 module.exports = {
     clearTestData: clearTestData,
     logCreatorPatron: logCreatorPatron,
@@ -197,5 +291,8 @@ module.exports = {
     checkUserExists: checkUserExists,
     addCreatorPatron: addCreatorPatron,
     unpledgeCreatorPatron: unpledgeCreatorPatron,
-    getCreatorPatronType: getCreatorPatronType
-}
+    getCreatorPatronType: getCreatorPatronType,
+    generateUserId: generateUserId,
+    storeUserId: storeUserId,
+    getCreatorPatrons: getCreatorPatrons
+};

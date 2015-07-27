@@ -1,4 +1,5 @@
 var expect = require('chai').expect;
+var assert = require('chai').assert;
 var path = require('path');
 
 
@@ -129,6 +130,51 @@ describe('Database', function() {
             });
         });
     });
+    
+    
+    it('should generate a unique ID for users', function(done) {
+        red.SMEMBERS('alertreon:userIds', function(err, originalIds) {
+            assert.equal(err, null, 'there was an error getting members of the redis alertreon ID set');
+            assert.typeOf(originalIds, 'Array', 'ids was not an array');
+            
+                db.generateUserId(function(id) {
+                    assert.match(id, /[0-9A-Z]{20}/, 'error generating alertreon user id');
+                    
+                    red.SISMEMBER('alertreon:userIds', id, function(err, isMember) {
+                        assert.equal(err, null, 'error checking if unique id was generated');
+                        assert.equal(isMember, 0, 'generated id was not unique');
+                        done();
+                    });
+                });
+        });
+    });
+    
+    
+    it('should associate alertreon id with patreon id', function(done) {
+        db.generateUserId(function(id) {
+            id = '__' + id; // prefix test identifier to id
+            db.storeUserId(id, 'starexorcist', function(err) {
+                assert.equal(err, null, 'there was an error associating alertreon user id with patreon user id');
+                
+                //clean up test k/v
+                red.DEL('alertreon:' + id, function(err, deleted) {
+                    assert.equal(err, null);
+                    assert.equal(deleted, 1);
+                    
+                    done();
+                });
+            });
+        });
+    });
 
+
+    it('should retrieve the known creator patrons from the database', function(done) {
+        db.getCreatorPatrons('starexorcist', function(err, patrons) {
+            console.log('got patrons: ', patrons)
+            assert.equal(err, null, 'error retrieving creators patrons');
+            assert.typeOf(patrons, 'array', 'patron list was not an array');
+            done();
+        });
+    });
 
 });
