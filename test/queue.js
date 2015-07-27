@@ -1,4 +1,5 @@
 var assert = require('chai').assert;
+var db = require('../database/datastore');
 
 
 describe('Queue', function() {
@@ -7,11 +8,15 @@ describe('Queue', function() {
     var queue = require('../queue/index');
 
 
-    it('should return an event emitter', function(done) {
+    it('should log an array of patrons to the database', function(done) {
 
-        queue.push({creatorName: 'starexorcist'}, 5, function(err, emitter) {
+	//db.
+        queue.push({creatorName: 'starexorcist'}, 5, function(err) {
             assert.equal(err, null, 'there was an error queueing the task');
-            assert.instanceOf('EventEmitter', emitter, 'queue did not return an event emitter. got instead: ' + typeof(emitter));
+	    
+	    
+	    // should callback without error
+            // assert.instanceOf('EventEmitter', emitter, 'queue did not return an event emitter. got instead: ' + typeof(emitter));
             done();
         });
         
@@ -19,7 +24,7 @@ describe('Queue', function() {
         //assert.instanceOf(creator, EventEmitter, 'creator is not an instance of event emitter')
 
         //creator.on('gotCreatorPatrons', function(err) {
-        console.log('error');
+        //console.log('error');
     });
 
     // creator.on('end', function() {

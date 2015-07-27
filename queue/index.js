@@ -4,7 +4,7 @@ var patreon = require('../patreon');
 
 
 var task = function(task, cb) {
-    console.log('hello ' + task.creatorName);
+    console.log('task created for patreon creator ' + task.creatorName);
     
     patreon.getCreatorPatrons(task.creatorName, function(err, patrons) {
         if (err) return cb(err);
@@ -22,19 +22,21 @@ q.drain = function() {
     console.log('all items have been processed');
 };
 
+
+
 // add some items to the queue 
-q.push({creatorName: 'josi'}, 1, function (err) {
-    if (err) console.error(err);
-    console.log('finished processing foo');
-});
+// q.push({creatorName: 'josi'}, 1, function (err) {
+//     if (err) console.error(err);
+//     console.log('finished processing foo');
+// });
 
-q.push({creatorName: 'starexorcist'}, 2, function (err) {
-    if (err) console.error(err);
-    console.log('finished processing bar');
-});
+// q.push({creatorName: 'starexorcist'}, 2, function (err) {
+//     if (err) console.error(err);
+//     console.log('finished processing bar');
+// });
 
 
-// // add some items to the front of the queue 
+// // Addc some items to the front of the queue 
 // q.unshift({name: 'bar'}, function (err) {
 //     console.log('finished processing bar');
 // });

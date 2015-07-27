@@ -198,5 +198,4 @@ module.exports = {
     addCreatorPatron: addCreatorPatron,
     unpledgeCreatorPatron: unpledgeCreatorPatron,
     getCreatorPatronType: getCreatorPatronType
-    
 }
