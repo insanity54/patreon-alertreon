@@ -31,6 +31,46 @@ fp.setPreference('dom.ipc.plugins.enabled.libflashplayer.so', 'false');
 
 //var creator = patreon.getCreatorPatrons('josi');
 
+    
+
+
+/**
+ * getCreatorPatronCount
+ *
+ * crawls the page and fetches the creator's listed patron count
+ *
+ * @param {String} patreonCreatorUsername
+ * @param {onGotCountCallback} cb
+ */
+var getCreatorPatronCount = function getCreatorPatronCount(patreonCreatorUsername, cb) {
+    
+    var capabilities = webdriver.Capabilities.firefox();
+    fp.encoded(function(encodedProfile) {
+	capabilities.set('firefox_profile', encodedProfile);
+	
+	var driver = new webdriver.Builder()
+            .forBrowser('firefox')
+            .withCapabilities(capabilities)
+            .build();
+	
+	
+	driver.get('https://www.patreon.com/' + patreonCreatorUsername + '?ty=p');
+	
+	getPatronCount(driver, patreonCreatorUsername, function(err, count) {
+	    if (err) return cb(err);
+	    return cb(null, count);
+	});
+    });
+}
+/**
+ * @callback {onGotCountCallback}
+ * @param {Error} err
+ * @param {integer} count
+ */
+
+
+
+
 
 
 
@@ -39,16 +79,15 @@ var getCreatorPatrons = function getCreatorPatrons(patreonCreatorUsername, cb) {
 
     var capabilities = webdriver.Capabilities.firefox();
     fp.encoded(function(encodedProfile) {
-        capabilities.set('firefox_profile', encodedProfile);
-
-        var driver = new webdriver.Builder()
+	capabilities.set('firefox_profile', encodedProfile);
+	
+	var driver = new webdriver.Builder()
             .forBrowser('firefox')
             .withCapabilities(capabilities)
             .build();
 
 
-
-        console.log('scraping https://www.patreon.com/' + patreonCreatorUsername + '?ty=p');
+        //console.log('scraping https://www.patreon.com/' + patreonCreatorUsername + '?ty=p');
 
         driver.get('https://www.patreon.com/' + patreonCreatorUsername + '?ty=p');
         //driver.get('https://www.patreon.com/schroedingham?ty=p');
@@ -89,7 +128,6 @@ var getCreatorPatrons = function getCreatorPatrons(patreonCreatorUsername, cb) {
                                 index++;
                                 console.log('completed', index, 'loop iteration');
 
-
                                 return processPatrons(index);
                             });
                         });
@@ -100,20 +138,8 @@ var getCreatorPatrons = function getCreatorPatrons(patreonCreatorUsername, cb) {
 
 
 
-
-
-        //var index = 0;
-        //var patrons = [];
         processPatrons();
-        // function(err, patrons) {
-        //     if (err) throw err;
-        //     console.log('patrons found:', patrons, 'for a total of', patrons.length);
-        // });
 
-        // , function(err, patrons) {
-        //     if (err) throw err;
-        //     console.log('patron processing complete. there are', patrons.length); //, 'patrons out of expected', expectedPatronsNum);
-        // });
     });
 };
 
@@ -125,6 +151,8 @@ var getCreatorPatrons = function getCreatorPatrons(patreonCreatorUsername, cb) {
 
 module.exports = {
     getCreatorPatrons: getCreatorPatrons,
+    getCreatorPatronCount: getCreatorPatronCount,    
     getPatronCount: getPatronCount,
-    getCreatorPage: getCreatorPage
+    getCreatorPage: getCreatorPage,
+    detectEnd: detectEnd
 };
