@@ -1,120 +1,246 @@
+'use strict';
 var gulp = require('gulp');
-var sourcemaps = require('gulp-sourcemaps');
-var imagemin = require('gulp-imagemin');
+var gutil = require('gulp-util');
 var del = require('del');
+var uglify = require('gulp-uglify');
+var gulpif = require('gulp-if');
+
+
+var notify = require('gulp-notify');
+
+var buffer = require('vinyl-buffer');
+var argv = require('yargs').argv;
+// sass
+var sass = require('gulp-sass');
+var postcss = require('gulp-postcss');
+var autoprefixer = require('autoprefixer-core');
+var sourcemaps = require('gulp-sourcemaps');
+// BrowserSync
+var browserSync = require('browser-sync');
+// js
 var watchify = require('watchify');
 var browserify = require('browserify');
 var source = require('vinyl-source-stream');
-var buffer = require('vinyl-buffer');
-var assign = require('lodash').assign;
-var gutil = require('gulp-util');
-var globby = require('globby');
-var browserSync = require('browser-sync');
-var reload = browserSync.reload;
+// image optimization
+var imagemin = require('gulp-imagemin');
+// linting
+var jshint = require('gulp-jshint');
+var stylish = require('jshint-stylish');
+// testing/mocha
+var mocha = require('gulp-mocha');
 
+// gulp build --production
+var production = !!argv.production;
+// determine if we're doing a build
+// and if so, bypass the livereload
+var build = argv._.length ? argv._[0] === 'build' : false;
+var watch = argv._.length ? argv._[0] === 'watch' : true;
 
+// ----------------------------
+// Error notification methods
+// ----------------------------
+var handleError = function(task) {
+  return function(err) {
 
-
-var paths = {
-  scripts: ['client/js/*.js'],
-  images: 'client/img/*'
+      notify.onError({
+        message: task + ' failed, check the logs..',
+        sound: false
+      })(err);
+    
+    gutil.log(gutil.colors.bgRed(task + ' error:'), gutil.colors.red(err));
+  };
 };
-
-var browserifyOptions = {
-  entries: ['client/js/main.js'],
-  debug: true
-};
-
-
-gulp.task('scripts', function () {
-  // "globby" replaces the normal "gulp.src" as Browserify
-  // creates it's own readable stream.
-  globby(['client/js/*.js'], function(err, entries) {
-    // ensure any errors from globby are handled
-    if (err) {
-      bundledStream.emit('error', err);
-      return;
-    }
-
-    // create the Browserify instance.
-    var b = browserify({
-      entries: entries,
-      debug: true,
-      transform: [reactify]
+// --------------------------
+// CUSTOM TASK METHODS
+// --------------------------
+var tasks = {
+  // --------------------------
+  // Delete build folder
+  // --------------------------
+  clean: function(cb) {
+    del(['dist/'], cb);
+  },
+  // --------------------------
+  // Copy static assets
+  // --------------------------
+  assets: function() {
+    return gulp.src('./client/assets/**/*')
+      .pipe(gulp.dest('dist/assets/'));
+  },
+  // --------------------------
+  // HTML
+  // --------------------------
+  // html templates (when using the connect server)
+  templates: function() {
+    gulp.src(['./client/templates/*.html', './client/*.html'])
+      .pipe(gulp.dest('dist/'));
+  },
+  // --------------------------
+  // SASS (libsass)
+  // --------------------------
+  sass: function() {
+    return gulp.src('./client/scss/*.scss')
+      // sourcemaps + sass + error handling
+      .pipe(gulpif(!production, sourcemaps.init()))
+      .pipe(sass({
+        sourceComments: !production,
+        outputStyle: production ? 'compressed' : 'nested'
+      }))
+      .on('error', handleError('SASS'))
+      // generate .maps
+      .pipe(gulpif(!production, sourcemaps.write({
+        'includeContent': false,
+        'sourceRoot': '.'
+      })))
+      // autoprefixer
+      .pipe(gulpif(!production, sourcemaps.init({
+        'loadMaps': true
+      })))
+      .pipe(postcss([autoprefixer({browsers: ['last 2 versions']})]))
+      // we don't serve the source files
+      // so include scss content inside the sourcemaps
+      .pipe(sourcemaps.write({
+        'includeContent': true
+      }))
+      // write sourcemaps to a specific directory
+      // give it a file and save
+      .pipe(gulp.dest('dist/css'));
+  },
+  // --------------------------
+  // Browserify
+  // --------------------------
+  browserify: function() {
+    var bundler = browserify('./client/js/index.js', {
+      debug: !production,
+      cache: {}
     });
-
-    // return the Browserify stream so gulp knows this task is done
-    return b.bundle();
-  });
-
-});
-
-var opts = assign({}, watchify.args, browserifyOptions);
-var b = watchify(browserify(opts)); 
-
-// add transformations here
-// i.e. b.transform(coffeeify);
-
-gulp.task('scripts', bundle); // so you can run `gulp js` to build the file
-b.on('update', bundle); // on any dep update, runs the bundler
-b.on('log', gutil.log); // output build logs to terminal
-
-function bundle() {
-  return b.bundle()
-    // log errors if they happen
-    .on('error', gutil.log.bind(gutil, 'Browserify Error'))
-    .pipe(source('bundle.js'))
-    // optional, remove if you don't need to buffer file contents
-    .pipe(buffer())
-    // optional, remove if you dont want sourcemaps
-    .pipe(sourcemaps.init({loadMaps: true})) // loads map from browserify file
-    // Add transformation tasks to the pipeline here.
-    .pipe(sourcemaps.write('./')) // writes .map file
-    .pipe(gulp.dest('./dist'));
-}
-
-
-
- 
-// Copy all static images 
-gulp.task('images', function() {
-  return gulp.src(paths.images)
-    // Pass in options to the task 
-    .pipe(imagemin({optimizationLevel: 5}))
-    .pipe(gulp.dest('dist/img'));
-});
-
-
-
-
-
-// watch files for changes and reload
-gulp.task('serve', function() {
-  browserSync({
-    server: {
-      baseDir: 'app'
+    // determine if we're doing a build
+    // and if so, bypass the livereload
+    var build = argv._.length ? argv._[0] === 'build' : false;
+    if (watch) {
+      bundler = watchify(bundler);
     }
-  });
+    var rebundle = function() {
+      return bundler.bundle()
+        .on('error', handleError('Browserify'))
+        .pipe(source('build.js'))
+        .pipe(gulpif(production, buffer()))
+        .pipe(gulpif(production, uglify()))
+        .pipe(gulp.dest('dist/js/'));
+    };
+    bundler.on('update', rebundle);
+    return rebundle();
+  },
+  // --------------------------
+  // linting
+  // --------------------------
+  lintjs: function() {
+    return gulp.src([
+        'gulpfile.js',
+        './client/js/index.js',
+        './client/js/**/*.js'
+      ]).pipe(jshint())
+      .pipe(jshint.reporter(stylish))
+      .on('error', function() {
+        gutil.log(gutil.colors.bgRed('ERROR'));
+      });
+  },
+  // --------------------------
+  // Optimize asset images
+  // --------------------------
+  optimize: function() {
+    return gulp.src('./client/assets/**/*.{gif,jpg,png,svg}')
+      .pipe(imagemin({
+        progressive: true,
+        svgoPlugins: [{removeViewBox: false}],
+        // png optimization
+        optimizationLevel: production ? 3 : 1
+      }))
+      .pipe(gulp.dest('./client/assets/'));
+  },
+  // --------------------------
+  // Testing with mocha
+  // --------------------------
+  test: function() {
+    return gulp.src('./client/**/*test.js', {read: false})
+      .pipe(mocha({
+        'ui': 'bdd',
+        'reporter': 'spec'
+      })
+    );
+  },
 
-  gulp.watch(['*.html', 'styles/**/*.css', 'scripts/**/*.js'], {cwd: 'app'}, reload);
-});
 
+};
 
-
-
-
-gulp.task('serve', function() {
+gulp.task('browser-sync', function() {
     browserSync({
         server: {
-            baseDir: 'client'
-        }
+            baseDir: "./dist"
+        },
+        port: process.env.PORT || 3000
     });
 });
 
-// npm install --save-dev browser-sync
+gulp.task('reload-sass', ['sass'], function(){
+  browserSync.reload();
+});
+gulp.task('reload-js', ['browserify'], function(){
+  browserSync.reload();
+});
+gulp.task('reload-templates', ['templates'], function(){
+  browserSync.reload();
+});
 
+// --------------------------
+// CUSTOMS TASKS
+// --------------------------
+gulp.task('clean', tasks.clean);
+// for production we require the clean method on every individual task
+var req = build ? ['clean'] : [];
+// individual tasks
+gulp.task('templates', req, tasks.templates);
+gulp.task('assets', req, tasks.assets);
+gulp.task('sass', req, tasks.sass);
+gulp.task('browserify', req, tasks.browserify);
+gulp.task('lint:js', tasks.lintjs);
+gulp.task('optimize', tasks.optimize);
+gulp.task('test', tasks.test);
 
+// --------------------------
+// DEV/WATCH TASK
+// --------------------------
+gulp.task('watch', ['assets', 'templates', 'sass', 'browserify', 'browser-sync'], function() {
 
- 
-// The default task (called when you run `gulp` from cli) 
-gulp.task('default', ['scripts', 'images']);
+  // --------------------------
+  // watch:sass
+  // --------------------------
+  gulp.watch('./client/scss/**/*.scss', ['reload-sass']);
+
+  // --------------------------
+  // watch:js
+  // --------------------------
+  gulp.watch('./client/js/**/*.js', ['lint:js', 'reload-js']);
+
+  // --------------------------
+  // watch:html
+  // --------------------------
+  gulp.watch(['./client/templates/**/*.html', './client/*.html'], ['reload-templates']);
+
+  gutil.log(gutil.colors.bgGreen('Watching for changes...'));
+});
+
+// build task
+gulp.task('build', [
+  'clean',
+  'templates',
+  'assets',
+  'sass',
+  'browserify'
+]);
+
+gulp.task('default', ['watch', 'browser-sync']);
+
+// gulp (watch) : for development and livereload
+// gulp build : for a one off development build
+// gulp build --production : for a minified production build
