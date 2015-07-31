@@ -28,10 +28,12 @@ describe('Patreon', function() {
 
 
     it('should get the official patron count for a creator', function(done) {
-	patreon.getCreatorPatronCount('starexorcist', function(err, count) {
-	    assert.equal(err, null, 'error while getting creator patron count');
+	var creator = 'pomplamoose';
+	patreon.getCreatorPatronCount(creator, function(err, count) {
+	    assert.equal(err, null, 'error while getting ' + creator + ' patron count');
 	    assert.typeOf(count, 'number', 'patron count was not a number');
-	    assert.isAbove(count, 1, 'starexorcist is showing less than 1 patron. This must be an error!');
+	    assert.isAbove(count, 1, creator + ' is showing less than 1 patron. This must be an error!');
+	    console.log('[test::patreon] From the official count, ' + creator + ' has ' + count + ' patrons');
 	    done();
 	});
     });
