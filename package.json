@@ -83,12 +83,7 @@
   "browserify": {
     "transform": [
       "browserify-shim",
-      "nunjucksify",
-      {
-        "extensions": [
-          "html"
-        ]
-      }
+      "nunjucksify"
     ]
   },
   "browser": {

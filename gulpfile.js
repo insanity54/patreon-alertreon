@@ -39,7 +39,7 @@ var production = !!argv.production;
 var build = argv._.length ? argv._[0] === 'build' : false;
 var watch = argv._.length ? argv._[0] === 'watch' : true;
 
-process.env.BROWSERIFYSHIM_DIAGNOSTICS=1;
+//process.env.BROWSERIFYSHIM_DIAGNOSTICS=0;
 
 
 
@@ -54,7 +54,7 @@ var handleError = function(task) {
         sound: false
       })(err);
     
-    gutil.log(gutil.colors.bgRed(task + ' error:'), gutil.colors.red(err));
+    gutil.log(gutil.colors.bgRed(task + ' errorz:'), gutil.colors.red(err));
   };
 };
 // --------------------------
@@ -167,7 +167,13 @@ var tasks = {
         .pipe(source('build.js'))
         .pipe(gulpif(production, buffer()))
         .pipe(gulpif(production, uglify()))
-        .pipe(gulp.dest('dist/js/'));
+        .pipe(gulp.dest('./dist/js'))
+        .on('end', function() {
+          
+          gutil.log(gutil.colors.bgGreen('bundle completo'));
+          
+        });
+
     };
     bundler.on('update', rebundle);
     return rebundle();

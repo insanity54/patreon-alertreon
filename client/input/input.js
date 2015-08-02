@@ -1,4 +1,4 @@
-var template = require('./input-template.html');
+var template = require('./input-template.nunj');
 var Backbone = require('backbone');
 var nunjucks = require('nunjucks');
 // $ = jQuery = require('jquery');

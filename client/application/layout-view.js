@@ -1,5 +1,5 @@
 var Marionette = require('backbone.marionette');
-var template = require('./layout-template.html');
+var template = require('./layout-template.nunj');
 
 module.exports = Marionette.LayoutView.extend({
   el: '.application',
