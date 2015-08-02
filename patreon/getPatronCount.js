@@ -16,19 +16,18 @@ module.exports = function getPatronCount(driver, patreonCreatorUsername, cb) {
     
     var elementPromise = driver.findElement(By.css('#categoryMenu > li:nth-child(4) > a:nth-child(1) > strong:nth-child(1)'))
 	.then(function(element) {
-    //elementPromise.then(function(element) {
+	    //elementPromise.then(function(element) {
 
-	console.log('got css selector');
+	    console.log('[patreon::getPatronCount] got css selector');
 
-	return cb(null, 5);
-
-        // var patronCount;
-        // element.getAttribute("innerHTML").then(function(attribute) {
-        //     // get just the username from the URL
-        //     patronCount = attribute || 0;
-        //     return cb(null, patronCount);
-        // });
-    });
+            var patronCount;
+            element.getAttribute("innerHTML").then(function(attribute) {
+                // get the patron count from the #categoryMenu heading
+		if (typeof attribute === 'undefined') return cb(new Error('could not get inner html of #categoryMenu patron heading'));
+                patronCount = parseInt(attribute);
+                return cb(null, patronCount);
+            });
+	});
 };
 /**
  * @Callback {patronCountCallback}
