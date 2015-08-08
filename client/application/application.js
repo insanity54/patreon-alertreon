@@ -1,7 +1,9 @@
 var $ = require('jquery');
-var _ = require('lodash');
+//var _ = require('lodash');
 //var radio = require('backbone.radio');
 //var nprogress = require('nprogress');
+//var Backbone = require('backbone');
+//Backbone.$ = $;
 var Marionette = require('backbone.marionette');
 var LayoutView = require('./layout-view');
 
@@ -12,10 +14,14 @@ var LayoutView = require('./layout-view');
 // });
 
 module.exports = Marionette.Application.extend({
-  initialize() {
-    this.$body = $(document.body);
+  initialize: function(options) {
+    
+    this.mergeOptions(options, ['container']);
+    console.log('The option is:', this.container);
+    
+    //this.$body = $(document.body);
     this.layout = new LayoutView();
-    console.log('render that app');
+    console.log('render that a');
     this.layout.render();
 
     // this.listenTo(routerChannel, {
@@ -24,6 +30,8 @@ module.exports = Marionette.Application.extend({
     //   'error:route'        : this.onErrorRoute
     // });
   }
+  
+  
 
 //   onBeforeEnterRoute() {
 //     console.log('onBeforeEnterRoute');
@@ -49,3 +57,5 @@ module.exports = Marionette.Application.extend({
 //     nprogress.done(true);
 //   }
 });
+
+

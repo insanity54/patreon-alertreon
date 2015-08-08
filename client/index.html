@@ -2,11 +2,13 @@
 
 <head>
     <title>Alertreon</title>
-    <link rel="stylesheet" href="/styles/josi.css">
     <link rel="stylesheet" href="/styles/bundle.css">
 </head>
 
 <body>
+
+    <div class="application">
+    </div>
 
     <div class="container">
         <div class="jumbotron">
@@ -77,13 +79,13 @@
     
         <!-- Patreon account input box -->
         <div id="nameInput">
-            <div id="nameInputHeading">Enter your Patreon username!</div>
+            <div id="nameInputHeading">Enter your Patreno username!</div>
             <div id="nameInputContent">
                 <div class="input-group">
                     <span class="input-group-addon" id="basic-addon1">https://www.patreon.com/</span>
-                    <input type="text" id="patreonUsername" class="form-control" placeholder="Username" aria-describedby="basic-addon1">
+                    <input type="text" id="patreonUsername_old" class="form-control" placeholder="usr" aria-describedby="basic-addon1">
                     <div class="input-group-btn">
-                        <button class="btn btn-default" type="button" id="submitPatreonUsername">Go!</button>
+                        <button class="btn btn-default" type="button" id="submitPatreonUsername_old">Go!</button>
                     </div>
                 </div>
             </div>
@@ -118,12 +120,8 @@
     </div>
 
     <!-- Scriptamundos -->
-    <!--<script src="/zepto.js"></script>-->
-    <!--<script src="/socket.io/socket.io.js"></script>-->
-    <!--<script src="/socket.js"></script>-->
-    <!--<script src="/updater.js"></script>-->
-    <!--<script src="/bootstrap/js/bootstrap.js"></script>-->
-    <script src="/js/build.js"></script>
+    <script src="/js/bundle.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
 
 
 </body>

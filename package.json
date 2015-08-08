@@ -25,11 +25,14 @@
   "dependencies": {
     "async": "^1.3.0",
     "backbone": "^1.2.1",
+    "backbone-query-parameters": "^0.4.0",
     "backbone.marionette": "^2.4.2",
+    "body-parser": "^1.13.3",
     "cheerio": "^0.19.0",
     "express": "^4.13.1",
     "firefox-profile": "^0.3.11",
     "gulp-less": "^3.0.3",
+    "handlebars": "^3.0.3",
     "jquery": "^2.1.4",
     "mocha": "^2.2.5",
     "nconf": "^0.7.1",
@@ -50,18 +53,22 @@
     "chai": "^3.0.0",
     "del": "^1.2.0",
     "globby": "^2.1.0",
+    "gulp-autoprefixer": "^2.3.1",
     "gulp-if": "^1.2.5",
     "gulp-imagemin": "^2.3.0",
     "gulp-jshint": "^1.11.2",
+    "gulp-load-plugins": "^1.0.0-rc.1",
     "gulp-minify-css": "^1.2.0",
     "gulp-mocha": "^2.1.3",
     "gulp-notify": "^2.2.0",
+    "gulp-plumber": "^1.0.1",
     "gulp-postcss": "^5.1.10",
     "gulp-rename": "^1.2.2",
     "gulp-sass": "^2.0.4",
     "gulp-sourcemaps": "^1.5.2",
     "gulp-uglify": "^1.2.0",
     "gulp-util": "^3.0.6",
+    "hbsfy": "^2.2.1",
     "jshint-stylish": "^2.0.1",
     "lodash": "^3.10.0",
     "mocha": "^2.2.5",
@@ -78,15 +85,25 @@
       "depends": [
         "jquery:jQuery"
       ]
-    }
+    },
+    "socket.io": "io"
   },
   "browserify": {
     "transform": [
-      "browserify-shim",
-      "nunjucksify"
+      [
+        "nunjucksify",
+        "hbsfy",
+        {
+          "extensions": [
+            "hbs"
+          ]
+        }
+      ],
+      "browserify-shim"
     ]
   },
   "browser": {
+    "socket.io": "./node_modules/socket.io/lib/client.js",
     "bootstrap": "./node_modules/bootstrap/dist/js/bootstrap.js",
     "jQuery": "./node_modules/jquery/dist/jquery.min.js",
     "nunjucks": "nunjucks/browser/nunjucks-slim"

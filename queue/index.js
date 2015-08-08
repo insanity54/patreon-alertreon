@@ -6,11 +6,13 @@ var patreon = require('../patreon');
 var task = function(task, cb) {
     console.log('task created for patreon creator ' + task.creatorName);
     
+    
+    
     patreon.getCreatorPatrons(task.creatorName, function(err, patrons) {
         if (err) return cb(err);
         console.log('task', task.creatorName, 'completed.');
-        return cb(null);
     });
+    return cb(null);
 };
 
 var q = async.priorityQueue(task, 1); // 1 worker

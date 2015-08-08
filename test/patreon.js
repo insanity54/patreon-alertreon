@@ -1,9 +1,9 @@
-var expect = require('chai').expect;
+//var expect = require('chai').expect;
 var assert = require('chai').assert;
-var path = require('path');
-var app = require(path.join('..', 'index'));
-var cheerio = require('cheerio');
-var request = require('request');
+//var path = require('path');
+//var app = require(path.join('..', 'index'));
+//var cheerio = require('cheerio');
+//var request = require('request');
 
 
 

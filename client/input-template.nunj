@@ -1,0 +1,18 @@
+{# name display thing (just for testing) #}
+<div id="nameDisplay">
+    <p>username: {{ username }}</p>
+</div>
+
+{# Patreon account input box #}
+<div id="nameInput">
+    <div id="nameInputHeading">Enter your Patreon username!</div>
+    <div id="nameInputContent">
+        <div class="input-group">
+            <span class="input-group-addon" id="basic-addon1">https://www.patreon.com/</span>
+            <input type="text" id="patreonUsername" class="form-control" placeholder="Username" aria-describedby="basic-addon1">
+            <div class="input-group-btn">
+                <button class="btn btn-default" type="button" id="submitPatreonUsername">Go!</button>
+            </div>
+        </div>
+    </div>
+</div>
