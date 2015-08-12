@@ -121,15 +121,15 @@ gulp.task('build', [
 ]);
 
 gulp.task('watch', ['build'], function(cb) {
-  browserSync({
-    server: {
-      baseDir: 'dist'
-    //   middleware: function(req, res, next) {
-    //     api(req, res, next);
-    //   }
-    },
-    port: process.env.PORT || 3000
-  });
+  // browserSync({
+  //   server: {
+  //     baseDir: 'dist'
+  //   //   middleware: function(req, res, next) {
+  //   //     api(req, res, next);
+  //   //   }
+  //   },
+  //   port: process.env.PORT || 3000
+  // });
 
   reporter = 'dot';
   bundler(true).on('update', function() {
