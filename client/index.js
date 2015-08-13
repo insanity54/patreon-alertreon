@@ -4,7 +4,8 @@
 
 require('./plugins');
 var Backbone = require('backbone');
-var tpl = require('./input-template.nunj');
+var inputTpl = require('./input-template.nunj');
+var statusTpl = require('./input-status.nunj');
 //require('./client');
 var io = require('socket.io-client');
 
@@ -36,11 +37,24 @@ var Creator = Backbone.Model.extend({
 });
 
 
+var Status = Backbone.View.extend({
+    el: '#status',
+    template: statusTpl,
+    initialize: function(model) {
+        this.model = model;
+        this.render();
+    },
+    render: function() {
+        console.log('rendering status');
+        this.$el.html(this.template.render());
+        return this;
+    }
+});
 
 
 var Input = Backbone.View.extend({
     el: '#nameInput',
-    template: tpl,
+    template: inputTpl,
     
     events: {
         "click #submitPatreonUsername": "submit",
@@ -61,8 +75,8 @@ var Input = Backbone.View.extend({
     },
     
     render: function() {
-        console.log('rendering input');
         this.$el.html(this.template.render({username: this.model.get("name")}));
+        return this;
     },
     
     initialize: function(model) {
@@ -75,8 +89,7 @@ var Input = Backbone.View.extend({
 var router = new Router();
 var creator = new Creator();
 var input = new Input(creator);
-
-
+var status = new Status(creator);
 
 
 

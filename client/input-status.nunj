@@ -1,0 +1,13 @@
+{# server status section #}
+<div class="row">
+    <div class="col-md-12">
+        <div class="well" id="status">
+            <div id="statusHeading">
+                Status
+            </div>
+            <div id="statusContent">
+                unknown
+            </div>
+        </div>
+    </div>
+</div>
