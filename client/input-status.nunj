@@ -8,6 +8,10 @@
             <div id="statusContent">
                 unknown
             </div>
+            <input id="inputter">
+            </input>
+            <button id="submitter">
+            </button>
         </div>
     </div>
 </div>

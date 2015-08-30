@@ -1,113 +1,66 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
-    <title>Alertreon</title>
-    <link rel="stylesheet" href="/styles/bundle.css">
+  <meta charset="utf-8">
+  <title>Backbone.js Todos</title>
+  <link rel="stylesheet" href="todos.css"/>
 </head>
 
 <body>
 
-    <div class="container">
-        <div class="jumbotron">
-            <noscript>
-                <div id="nojavascript">
-                    Your browser does not support JavaScript! Alertreon requires it.
-                </div>
-            </noscript>
-        
-        
-        
-            <!-- intro -->
-            <div id="intro">
-                <div id="introHeading">
-                    <h1>Alertreon</h1>
-                </div>
-                <div id="introContent">
-                    <p>Finally, an easy way to generate an alert when someone pledges to your Patreon page! The alert can be used with twitch.tv to show notifications in your stream.</p>
-                </div>
-            </div>
-        </div>
-    
-    
-    
-        <!-- flashes -->
-        <div class="row">
-            <div class="col-md-12">
-                <div id="flashes">
-                    <div class="alert alert-success" role="alert">
-                        test
-                    </div>
-                </div>
-            </div>
-        </div>
-    
-        
-        
-        <!-- section to show status (loading, queued, crawling, etc.) -->
-        <div id="status"></div>
+  <div id="todoapp">
 
-        
-        
-        <!-- Section showing your linked Patreon account -->
-        <div id="patreonAccount">
-            <div id="patreonAccountHeading">
-                Your patreon account
-            </div>
-            <div id="patreonAccountContent">
-                n/a
-            </div>
-        </div>
-        <br>
-    
-    
-    
-        <!-- Patreon account input box -->
-        <div id="nameInput">
-            <!--<div id="nameInputHeading">Enter your Patreno username!</div>-->
-            <!--<div id="nameInputContent">-->
-            <!--    <div class="input-group">-->
-            <!--        <span class="input-group-addon" id="basic-addon1">https://www.patreon.com/</span>-->
-            <!--        <input type="text" id="patreonUsername_old" class="form-control" placeholder="usr" aria-describedby="basic-addon1">-->
-            <!--        <div class="input-group-btn">-->
-            <!--            <button class="btn btn-default" type="button" id="submitPatreonUsername_old">Go!</button>-->
-            <!--        </div>-->
-            <!--    </div>-->
-            <!--</div>-->
-        </div>
-    
-    
-    
-        <!-- buffer space -->
-        <div class="buffer-sm"></div>
-        <div class="line"></div>
-        
-        
-        
-        
-        <!-- Comments/Feedback -->
-        <h4>Comments and feature requests</h4>
-        <div id="disqus_thread"></div>
-        <script type="text/javascript">
-            /* * * CONFIGURATION VARIABLES * * */
-            var disqus_shortname = 'alertreontv';
-    
-            /* * * DON'T EDIT BELOW THIS LINE * * */
-            (function() {
-                var dsq = document.createElement('script');
-                dsq.type = 'text/javascript';
-                dsq.async = true;
-                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-            })();
-        </script>
-        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
-    </div>
+    <header>
+      <h1>Todos</h1>
+      <input id="new-todo" type="text" placeholder="What needs to be done?">
+    </header>
+
+    <section id="main">
+      <input id="toggle-all" type="checkbox">
+      <label for="toggle-all">Mark all as complete</label>
+      <ul id="todo-list"></ul>
+    </section>
+
+    <footer>
+      <a id="clear-completed">Clear completed</a>
+      <div id="todo-count"></div>
+    </footer>
+
+  </div>
+
+  <div id="instructions">
+    Double-click to edit a todo.
+  </div>
+
+  <div id="credits">
+    Created by
+    <br />
+    <a href="http://jgn.me/">J&eacute;r&ocirc;me Gravel-Niquet</a>.
+    <br />Rewritten by: <a href="https://github.com/tastejs/todomvc">TodoMVC</a>.
+  </div>
 
     <!-- Scriptamundos -->
     <script src="/js/bundle.js"></script>
     <script src="/socket.io/socket.io.js"></script>
 
+  <!-- Templates -->
 
-</body>
+  <script type="text/template" id="item-template">
+    <div class="view">
+      <input class="toggle" type="checkbox" <%= done ? 'checked="checked"' : '' %> />
+      <label><%- title %></label>
+      <a class="destroy"></a>
+    </div>
+    <input class="edit" type="text" value="<%- title %>" />
+  </script>
 
+  <script type="text/template" id="stats-template">
+    <% if (done) { %>
+      <a id="clear-completed">Clear <%= done %> completed <%= done == 1 ? 'item' : 'items' %></a>
+    <% } %>
+    <div class="todo-count"><b><%= remaining %></b> <%= remaining == 1 ? 'item' : 'items' %> left</div>
+  </script>
+
+  </body>
 </html>
