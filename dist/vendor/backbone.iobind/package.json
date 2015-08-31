@@ -1,0 +1,26 @@
+{
+  "author": "Jake Luer <@jakeluer>",
+  "name": "backbone.iobind",
+  "description": "Bind socket.io events to backbone models & collections.",
+  "version": "0.4.9",
+  "homepage": "https://noveogroup.github.io/backbone.iobind",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/noveogroup/backbone.iobind.git"
+  },
+  "engines": {
+    "node": ">= 0.4.0"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "codex": "0.0.x",
+    "folio": "0.2.x",
+    "colors": "0.6.x",
+    "socket.io": "1.1.x",
+    "socket.io-client": "1.1.x",
+    "backbone": "1.1.x",
+    "underscore": "1.7.x",
+    "jquery": "1.8.3",
+    "mocha": "1.21.4"
+  }
+}

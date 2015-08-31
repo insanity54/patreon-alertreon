@@ -17,8 +17,6 @@
     </header>
 
     <section id="main">
-      <input id="toggle-all" type="checkbox">
-      <label for="toggle-all">Mark all as complete</label>
       <ul id="todo-list"></ul>
     </section>
 
@@ -30,28 +28,36 @@
   </div>
 
   <div id="instructions">
-    Double-click to edit a todo.
+    
   </div>
 
   <div id="credits">
-    Created by
+    Created with <img src="img/heart.png" alt="love"></img> by
     <br />
-    <a href="http://jgn.me/">J&eacute;r&ocirc;me Gravel-Niquet</a>.
-    <br />Rewritten by: <a href="https://github.com/tastejs/todomvc">TodoMVC</a>.
+    <a href="http://grimtech.net/about">Chris Grimmett</a>.
   </div>
+
 
   <script src="./vendor/json2/json2.js"></script>
   <script src="./vendor/jquery/dist/jquery.js"></script>
   <script src="./vendor/underscore/underscore.js"></script>
   <script src="./vendor/backbone/backbone.js"></script>
-  <script src="./vendor/backbone.localstorage/backbone.localStorage.js"></script>
+  <!--<script src="https://cdn.socket.io/socket.io-1.0.0.js"></script>-->
+  <script src="https://patreon-alertreon-insanity54.c9.io/socket.io/socket.io.js"></script>
+  <script>
+    window.socket = io('https://patreon-alertreon-insanity54.c9.io/');
+  </script>
+
+  
+  <script src="./vendor/backbone.iobind/dist/backbone.iobind.js"></script>
+  <script src="./vendor/backbone.iobind/dist/backbone.iosync.js"></script>
+  <!--<script src="./vendor/backbone.localstorage/backbone.localStorage.js"></script>-->
   <script src="./js/todos.js"></script>
 
   <!-- Templates -->
 
   <script type="text/template" id="item-template">
     <div class="view">
-      <input class="toggle" type="checkbox" <%= done ? 'checked="checked"' : '' %> />
       <label><%- title %></label>
       <a class="destroy"></a>
     </div>
@@ -59,10 +65,13 @@
   </script>
 
   <script type="text/template" id="stats-template">
-    <% if (done) { %>
-      <a id="clear-completed">Clear <%= done %> completed <%= done == 1 ? 'item' : 'items' %></a>
+    <div class="status"><%= status %></div>
+    <% if (id) { %>
+      Your alert link
+      <a class="alert-link" href="//<%= window.location.hostname %>/patreon/alerts/<%= id %>"><%= window.location.hostname %>/patreon/alert/<%= id %></a>
+    <% } else { %>
+      Generating alert link...
     <% } %>
-    <div class="todo-count"><b><%= remaining %></b> <%= remaining == 1 ? 'item' : 'items' %> left</div>
   </script>
 
   </body>

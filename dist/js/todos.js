@@ -3,6 +3,7 @@
 // [LocalStorage adapter](backbone.localStorage.html)
 // to persist Backbone models within your browser.
 
+
 // Load the application once the DOM is ready, using `jQuery.ready`:
 $(function(){
 
@@ -16,17 +17,15 @@ $(function(){
     defaults: function() {
       return {
         title: "empty todo...",
-        order: Todos.nextOrder(),
-        done: false
+        name: "josi",
+        status: "idle",
+        order: Todos.nextOrder()
       };
     },
 
-    // Toggle the `done` state of this todo item.
-    toggle: function() {
-      this.save({done: !this.get("done")});
-    }
-
+    
   });
+
 
   // Todo Collection
   // ---------------
@@ -35,21 +34,24 @@ $(function(){
   // server.
   var TodoList = Backbone.Collection.extend({
 
+    url: '/patreon/users',
+
     // Reference to this collection's model.
     model: Todo,
 
     // Save all of the todo items under the `"todos-backbone"` namespace.
-    localStorage: new Backbone.LocalStorage("todos-backbone"),
+    //localStorage: new Backbone.LocalStorage("todos-backbone"),
+    
 
     // Filter down the list of all todo items that are finished.
-    done: function() {
-      return this.where({done: true});
-    },
+    // done: function() {
+    //   return this.where({done: true});
+    // },
 
     // Filter down the list to only todo items that are still not finished.
-    remaining: function() {
-      return this.where({done: false});
-    },
+    // remaining: function() {
+    //   return this.where({done: false});
+    // },
 
     // We keep the Todos in sequential order, despite being saved by unordered
     // GUID in the database. This generates the next order number for new items.
@@ -80,8 +82,6 @@ $(function(){
 
     // The DOM events specific to an item.
     events: {
-      "click .toggle"   : "toggleDone",
-      "dblclick .view"  : "edit",
       "click a.destroy" : "clear",
       "keypress .edit"  : "updateOnEnter",
       "blur .edit"      : "close"
@@ -98,21 +98,16 @@ $(function(){
     // Re-render the titles of the todo item.
     render: function() {
       this.$el.html(this.template(this.model.toJSON()));
-      this.$el.toggleClass('done', this.model.get('done'));
+      //this.$el.toggleClass('done', this.model.get('done'));
       this.input = this.$('.edit');
       return this;
     },
 
-    // Toggle the `"done"` state of the model.
-    toggleDone: function() {
-      this.model.toggle();
-    },
-
-    // Switch this view into `"editing"` mode, displaying the input field.
-    edit: function() {
-      this.$el.addClass("editing");
-      this.input.focus();
-    },
+    // // Switch this view into `"editing"` mode, displaying the input field.
+    // edit: function() {
+    //   this.$el.addClass("editing");
+    //   this.input.focus();
+    // },
 
     // Close the `"editing"` mode, saving changes to the todo.
     close: function() {
@@ -133,9 +128,14 @@ $(function(){
     // Remove the item, destroy the model.
     clear: function() {
       this.model.destroy();
+      
     }
 
   });
+  
+  
+  
+  
 
   // The Application
   // ---------------
@@ -153,8 +153,6 @@ $(function(){
     // Delegated events for creating new items, and clearing completed ones.
     events: {
       "keypress #new-todo":  "createOnEnter",
-      "click #clear-completed": "clearCompleted",
-      "click #toggle-all": "toggleAllComplete"
     },
 
     // At initialization we bind to the relevant events on the `Todos`
@@ -163,34 +161,44 @@ $(function(){
     initialize: function() {
 
       this.input = this.$("#new-todo");
-      this.allCheckbox = this.$("#toggle-all")[0];
 
       this.listenTo(Todos, 'add', this.addOne);
+      this.listenTo(Todos, 'remove', this.deleteOne);
       this.listenTo(Todos, 'reset', this.addAll);
       this.listenTo(Todos, 'all', this.render);
+      this.listenTo(Todos, 'add', this.updateStats);
 
       this.footer = this.$('footer');
       this.main = $('#main');
 
       Todos.fetch();
     },
+    
+    updateStats: function(model) {
+      //console.log('udpate stats')
+      var status = model.get("status");
+      var id = model.get("id");
+      
+      this.footer.html(this.statsTemplate({id: id, status: status}));
+    },
+    
 
     // Re-rendering the App just means refreshing the statistics -- the rest
     // of the app doesn't change.
     render: function() {
-      var done = Todos.done().length;
-      var remaining = Todos.remaining().length;
+      
+      //console.log('model is', model);
+      //var done = Todos.done().length;
+      //var remaining = Todos.remaining().length;
 
       if (Todos.length) {
         this.main.show();
         this.footer.show();
-        this.footer.html(this.statsTemplate({done: done, remaining: remaining}));
+        //this.footer.html(this.statsTemplate({id: id, status: status}));
       } else {
         this.main.hide();
         this.footer.hide();
       }
-
-      this.allCheckbox.checked = !remaining;
     },
 
     // Add a single todo item to the list by creating a view for it, and
@@ -198,6 +206,11 @@ $(function(){
     addOne: function(todo) {
       var view = new TodoView({model: todo});
       this.$("#todo-list").append(view.render().el);
+      this.input.hide();
+    },
+    
+    deleteOne: function(todo) {
+      this.input.show();
     },
 
     // Add all items in the **Todos** collection at once.
@@ -213,18 +226,14 @@ $(function(){
 
       Todos.create({title: this.input.val()});
       this.input.val('');
+      
     },
 
     // Clear all done todo items, destroying their models.
-    clearCompleted: function() {
-      _.invoke(Todos.done(), 'destroy');
-      return false;
-    },
-
-    toggleAllComplete: function () {
-      var done = this.allCheckbox.checked;
-      Todos.each(function (todo) { todo.save({'done': done}); });
-    }
+    // clearCompleted: function() {
+    //   _.invoke(Todos.done(), 'destroy');
+    //   return false;
+    // },
 
   });
 
