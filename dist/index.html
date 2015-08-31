@@ -43,9 +43,9 @@
   <script src="./vendor/underscore/underscore.js"></script>
   <script src="./vendor/backbone/backbone.js"></script>
   <!--<script src="https://cdn.socket.io/socket.io-1.0.0.js"></script>-->
-  <script src="https://patreon-alertreon-insanity54.c9.io/socket.io/socket.io.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
   <script>
-    window.socket = io('https://patreon-alertreon-insanity54.c9.io/');
+    window.socket = io('//' + window.location.hostname);
   </script>
 
   
