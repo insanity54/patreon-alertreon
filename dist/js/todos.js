@@ -16,7 +16,6 @@ $(function(){
     // Default attributes for the todo item.
     defaults: function() {
       return {
-        title: "empty todo...",
         name: "josi",
         status: "idle",
         order: Todos.nextOrder()
@@ -115,7 +114,7 @@ $(function(){
       if (!value) {
         this.clear();
       } else {
-        this.model.save({title: value});
+        this.model.save({name: value});
         this.$el.removeClass("editing");
       }
     },
@@ -224,7 +223,7 @@ $(function(){
       if (e.keyCode != 13) return;
       if (!this.input.val()) return;
 
-      Todos.create({title: this.input.val()});
+      Todos.create({name: this.input.val()});
       this.input.val('');
       
     },

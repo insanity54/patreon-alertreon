@@ -3,7 +3,7 @@ patreon twitch.tv / OBS alerts
 
 
 
-# todo: 
+## todo: 
 
   [x] get bootstrap rendered on page
   [ ] backbonify the input box
@@ -12,7 +12,7 @@ patreon twitch.tv / OBS alerts
   
   
   
-# code notes
+## code notes
 
 think of the app as different people.
 
@@ -32,4 +32,20 @@ think of the app as different people.
     * api guy tells crawler to crawl a user's page
     *  
     
+actually...
+
+everything just goes thru redis. redis is the queue. the differnt modules will subscribe to redis and get updated when the GUI does something to add a k/v into redis
+
+
+    
+
+#### redis scheme:
+
+  * patreon:__alertreontest:patronsCurrent         test data
+  * patreon:__alertreontest:patronsAllTime         test data
+  * patreon:<creatorName>:patronsAllTime           set of patrons who have ever pleged to creatorName
+  * patreon:<creatorName>:patronsCurrent           set of patrons pledged to creatorName
+  * alertreon:<aletreonUserId>:patreonUserid       links alertreon user to patreon creator
+  * 
+
 

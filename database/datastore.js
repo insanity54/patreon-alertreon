@@ -265,6 +265,8 @@ var storeUserId = function storeUserId(aletreonUserId, patreonUserid, cb) {
 /**
  * getCreatorPatrons
  * 
+ * DEPRECATED(?)
+ * 
  * gets a list of known patrons that are saved in the database.
  * 
  * @param {String} patreonUsername
