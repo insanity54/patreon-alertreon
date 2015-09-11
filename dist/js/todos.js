@@ -19,24 +19,24 @@ $(function(){
     // Default attributes for the todo item.
     defaults: function() {
       return {
-        name: "josi",
+        name: "pumplamoose",
         status: "idle",
-        order: Todos.nextOrder()
+        //order: Todos.nextOrder()
       };
     },
     
-    initialize: function() {
-      if (!this.noIoBind) {
-        this.ioBind('create', this.serverChange, this);
-      }
-    },
+    // initialize: function() {
+    //   if (!this.noIoBind) {
+    //     this.ioBind('create', this.serverChange, this);
+    //   }
+    // },
     
-    serverChange: function (data) {
-      console.log('server change model');
-      // Useful to prevent loops when dealing with client-side updates (ie: forms).
-      data.fromServer = true;
-      this.set(data);
-    }
+    // serverChange: function (data) {
+    //   console.log('server change model');
+    //   // Useful to prevent loops when dealing with client-side updates (ie: forms).
+    //   data.fromServer = true;
+    //   this.set(data);
+    // }
   });
 
 
@@ -63,7 +63,7 @@ $(function(){
     
     serverChange: function (data) {
       console.log('server change collection');
-      console.log(this.models);
+      //console.log(this.models);
       // Useful to prevent loops when dealing with client-side updates (ie: forms).
       data.fromServer = true;
       this.set(data);
@@ -108,15 +108,15 @@ $(function(){
     // The DOM events specific to an item.
     events: {
       "click a.destroy" : "clear",
-      "keypress .edit"  : "updateOnEnter",
-      "blur .edit"      : "close"
+    //  "keypress .edit"  : "updateOnEnter",
+    //  "blur .edit"      : "close"
     },
 
     // The TodoView listens for changes to its model, re-rendering. Since there's
     // a one-to-one correspondence between a **Todo** and a **TodoView** in this
     // app, we set a direct reference on the model for convenience.
     initialize: function() {
-      this.listenTo(this.model, 'change', this.render);
+      //this.listenTo(this.model, 'change', this.render);
       this.listenTo(this.model, 'destroy', this.remove);
     },
 
@@ -135,25 +135,24 @@ $(function(){
     // },
 
     // Close the `"editing"` mode, saving changes to the todo.
-    close: function() {
-      var value = this.input.val();
-      if (!value) {
-        this.clear();
-      } else {
-        this.model.save({name: value});
-        this.$el.removeClass("editing");
-      }
-    },
+    // close: function() {
+    //   var value = this.input.val();
+    //   if (!value) {
+    //     this.clear();
+    //   } else {
+    //     this.model.save({name: value});
+    //     this.$el.removeClass("editing");
+    //   }
+    // },
 
     // If you hit `enter`, we're through editing the item.
-    updateOnEnter: function(e) {
-      if (e.keyCode == 13) this.close();
-    },
+    // updateOnEnter: function(e) {
+    //   if (e.keyCode == 13) this.close();
+    // },
 
     // Remove the item, destroy the model.
     clear: function() {
       this.model.destroy();
-      
     }
 
   });
@@ -203,8 +202,9 @@ $(function(){
       //console.log('udpate stats')
       var status = model.get("status");
       var id = model.get("id");
+      var name = model.get("name");
       
-      this.footer.html(this.statsTemplate({id: id, status: status}));
+      this.footer.html(this.statsTemplate({id: id, status: status, name: name}));
     },
     
 
@@ -212,7 +212,7 @@ $(function(){
     // of the app doesn't change.
     render: function() {
       
-      //console.log('model is', model);
+      //console.log('RENDERING. ');
       //var done = Todos.done().length;
       //var remaining = Todos.remaining().length;
 
@@ -229,7 +229,7 @@ $(function(){
     // Add a single todo item to the list by creating a view for it, and
     // appending its element to the `<ul>`.
     addOne: function(todo) {
-      console.log('addOne');
+      console.log('addOne! todo- ', todo);
       var view = new TodoView({model: todo});
       this.$("#todo-list").append(view.render().el);
       this.input.hide();
@@ -241,6 +241,7 @@ $(function(){
 
     // Add all items in the **Todos** collection at once.
     addAll: function() {
+      console.log('addAll ');
       Todos.each(this.addOne, this);
     },
 
@@ -250,7 +251,16 @@ $(function(){
       if (e.keyCode != 13) return;
       if (!this.input.val()) return;
       
-      Todos.create({ noIoBind: true, name: this.input.val() });
+      console.log('creating ', this.input.val());
+      var attrs = {
+        noIoBind: true,
+        name: this.input.val()
+      };
+      
+      var _todo = new Todo();
+      _todo.set(attrs);
+      console.log(_todo.attributes);
+      _todo.save();
       this.input.val('');
       
       
