@@ -209,3 +209,8 @@ body {
 #credits a {
 	color: #888;
 }
+
+#description {
+	font-size: 12px;
+	text-align: center;
+}

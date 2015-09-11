@@ -13,6 +13,7 @@
 
     <header>
       <h1>Alertreon</h1>
+      <p id="description">An easy way to generate a twitch.tv alert when someone pledges to your Patreon page</p>
       <input id="new-todo" type="text" placeholder="Enter your Patreon username">
     </header>
 
@@ -38,21 +39,21 @@
   </div>
 
 
+
   <script src="./vendor/json2/json2.js"></script>
   <script src="./vendor/jquery/dist/jquery.js"></script>
   <script src="./vendor/underscore/underscore.js"></script>
   <script src="./vendor/backbone/backbone.js"></script>
-  <!--<script src="https://cdn.socket.io/socket.io-1.0.0.js"></script>-->
   <script src="/socket.io/socket.io.js"></script>
   <script>
     window.socket = io('//' + window.location.hostname);
   </script>
 
-  
   <script src="./vendor/backbone.iobind/dist/backbone.iobind.js"></script>
   <script src="./vendor/backbone.iobind/dist/backbone.iosync.js"></script>
-  <!--<script src="./vendor/backbone.localstorage/backbone.localStorage.js"></script>-->
   <script src="./js/todos.js"></script>
+  
+  
 
   <!-- Templates -->
 

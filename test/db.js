@@ -176,5 +176,26 @@ describe('Database', function() {
             done();
         });
     });
+    
+    
+    describe('addPatreonCreator', function() {
+        it('should create a new patreon creator in the database', function(done) {
+            db.addPatreonCreator('__boygeorge', function(err, response) {
+                assert.equal(err, null, 'error adding patreon creator');
+                assert.equal(response.status, 0, 'adding patreon creator returned non-zero');
+                assert.equal(response.message, 'OK', 'creating new patreon creator in db not OK');
+                return(done);
+            });
+        });
+        
+        it('should respond with already exists message when adding patreon creator that\'s already in the database', function(done) {
+            db.addPatreonCreator('__boygeorge', function(err, response) {
+                assert.equal(err, null, 'error adding patreon creator');
+                assert.notEqual(response.status, 0);
+                assert.equal(response.message, /creator already exists/);
+                return(done);
+            });
+        });
+    });
 
 });

@@ -13,6 +13,9 @@ $(function(){
   // Our basic **Todo** model has `title`, `order`, and `done` attributes.
   var Todo = Backbone.Model.extend({
 
+    urlRoot: 'puser',
+    noIoBind: false,
+    
     // Default attributes for the todo item.
     defaults: function() {
       return {
@@ -21,8 +24,19 @@ $(function(){
         order: Todos.nextOrder()
       };
     },
-
     
+    initialize: function() {
+      if (!this.noIoBind) {
+        this.ioBind('create', this.serverChange, this);
+      }
+    },
+    
+    serverChange: function (data) {
+      console.log('server change model');
+      // Useful to prevent loops when dealing with client-side updates (ie: forms).
+      data.fromServer = true;
+      this.set(data);
+    }
   });
 
 
@@ -33,7 +47,7 @@ $(function(){
   // server.
   var TodoList = Backbone.Collection.extend({
 
-    url: '/patreon/users',
+    url: 'pusers',
 
     // Reference to this collection's model.
     model: Todo,
@@ -41,7 +55,19 @@ $(function(){
     // Save all of the todo items under the `"todos-backbone"` namespace.
     //localStorage: new Backbone.LocalStorage("todos-backbone"),
     
-
+    initialize: function() {
+      if (!this.noIoBind) {
+        this.ioBind('create', this.serverChange, this);
+      }
+    },
+    
+    serverChange: function (data) {
+      console.log('server change collection');
+      console.log(this.models);
+      // Useful to prevent loops when dealing with client-side updates (ie: forms).
+      data.fromServer = true;
+      this.set(data);
+    },
     // Filter down the list of all todo items that are finished.
     // done: function() {
     //   return this.where({done: true});
@@ -203,6 +229,7 @@ $(function(){
     // Add a single todo item to the list by creating a view for it, and
     // appending its element to the `<ul>`.
     addOne: function(todo) {
+      console.log('addOne');
       var view = new TodoView({model: todo});
       this.$("#todo-list").append(view.render().el);
       this.input.hide();
@@ -222,9 +249,11 @@ $(function(){
     createOnEnter: function(e) {
       if (e.keyCode != 13) return;
       if (!this.input.val()) return;
-
-      Todos.create({name: this.input.val()});
+      
+      Todos.create({ noIoBind: true, name: this.input.val() });
       this.input.val('');
+      
+      
       
     },
 

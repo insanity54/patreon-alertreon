@@ -1,6 +1,7 @@
 var redis = require('redis');
 var red = redis.createClient();
 var async = require('async');
+var moment = require('moment');
 
 
 // {SET} patreon:<patreonUserName>:patrons              a set containing a creator's patrons
@@ -8,6 +9,8 @@ var async = require('async');
 //                                                      with patreon id)
 // {SET} patreon:<patreonUserName>:patronsCurrent       
 // {SET} alertreon:userIds                              a set containing all user ids (used for alert-box)
+
+// {SET} admin:patreon:creators
 
 
 var clearTestData = function clearTestData(cb) {
@@ -136,6 +139,36 @@ var addCreatorPatron = function addCreatorPatron(creatorId, patronId, cb) {
  * @param {int} code - non-zero if there was a problem
  */
 
+
+
+/**
+ * Add the patreon creator to the database
+ * 
+ * @param {String} creatorId - Patreon id of the creator. ex: 'pomplamoose'
+ * @param {addedCallback} cb - callback once added or failed to add
+ */
+var addPatreonCreator = function addPatreonCreator(creatorId, cb) {
+    red.GET('patreon:' + creatorId, function(err, value) {
+        if (err) throw err;
+        if (value != null) return cb(null, {status: 1, message: 'creator already exists'});
+        
+        red.SADD('admin:patreon:creators', creatorId);
+        red.SET('patreon:' + creatorId, moment().format());
+        
+        return cb(null, {status: 0, message: 'OK'});
+    });
+};
+/**
+ * addedCallback
+ * 
+ * @param {Error} err
+ * @param {object} response
+ * @param {string} response.status - non-zero if problems
+ * @param {string} response.type - 'new' or 'renew' which indicates the patron type
+ */
+ 
+ 
+ 
 
 /**
  * after the initial crawl, this runs for every patron.
@@ -296,5 +329,6 @@ module.exports = {
     getCreatorPatronType: getCreatorPatronType,
     generateUserId: generateUserId,
     storeUserId: storeUserId,
-    getCreatorPatrons: getCreatorPatrons
+    getCreatorPatrons: getCreatorPatrons,
+    addPatreonCreator: addPatreonCreator
 };
