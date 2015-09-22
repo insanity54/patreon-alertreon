@@ -5,22 +5,25 @@ var moment = require('moment');
 
 
 // {SET} patreon:<patreonUserName>:patrons              a set containing a creator's patrons
-// {KEY} patreon:<patreonUserName>                      a key containing patreon id (associates aletreon id 
-//                                                      with patreon id)
+// {KEY} patreon:<patreonUserName>                      a key containing timestamp username was added via app gui
 // {SET} patreon:<patreonUserName>:patronsCurrent       
 // {SET} alertreon:userIds                              a set containing all user ids (used for alert-box)
+// {KEY} alertreon:<userId>                             a key containing patreon id
+
+// {SET} twitch:<twitchId>                              a set containing associated alertreon alerts
+
 
 // {SET} admin:patreon:creators
 
 
 var clearTestData = function clearTestData(cb) {
     red.DEL('patreon:__alertreontest:patronsAllTime', function(err) {
-	if (err) return cb(err);
-	
-	red.DEL('patreon:__alertreontest:patronsCurrent', function(err) {
-	    if (err) return cb(err);
-	    return cb(null);
-	});
+        if (err) return cb(err);
+
+        red.DEL('patreon:__alertreontest:patronsCurrent', function(err) {
+            if (err) return cb(err);
+            return cb(null);
+        });
     });
 };
 
@@ -39,12 +42,12 @@ var getCreatorPatronType = function getCreatorPatronType(creatorName, patronId, 
         red.SISMEMBER('patreon:' + creatorName + ':patronsCurrent', patronId, function(err, reply) {
             if (err) throw err;
             if (reply === 0) {
-		// renewing patron!
+                // renewing patron!
                 return cb(null, 'renew');
             }
 
-	    // alert has been generated previously for this patron
-	    return cb(null, 0);
+            // alert has been generated previously for this patron
+            return cb(null, 0);
         });
     });
 };
@@ -59,8 +62,8 @@ var getCreatorPatronType = function getCreatorPatronType(creatorName, patronId, 
 
 var checkCreatorExists = function checkCreatorExists(id, cb) {
     red.EXISTS('patreon:' + id, function(err, exists) {
-	if (err) return cb(err);
-	return cb(null, exists);
+        if (err) return cb(err);
+        return cb(null, exists);
     });
 };
 
@@ -94,9 +97,9 @@ var removeUser = function removeUser(id, cb) {
  */
 var unpledgeCreatorPatron = function unpledgeCreatorPatron(creatorId, patronId, cb) {
     red.SREM('patreon:' + creatorId + ':patronsCurrent', patronId, function(err, ok) {
-	if (err) throw err;
-	if (!ok) return cb(null, 1);
-	return cb(null, 0);
+        if (err) throw err;
+        if (!ok) return cb(null, 1);
+        return cb(null, 0);
     });
 };
 
@@ -122,15 +125,15 @@ var unpledgeCreatorPatron = function unpledgeCreatorPatron(creatorId, patronId, 
  */
 var addCreatorPatron = function addCreatorPatron(creatorId, patronId, cb) {
     red.SADD('patreon:' + creatorId + ':patronsAllTime', patronId, function(err, ok) {
-	if (err) throw err;
-	if (!ok) return cb(null, 1);
+        if (err) throw err;
+        if (!ok) return cb(null, 1);
 
-	red.SADD('patreon:' + creatorId + ':patronsCurrent', patronId, function(err, ok) {
-	    if (err) throw err;
-	    if (!ok) return cb(null, 1);
+        red.SADD('patreon:' + creatorId + ':patronsCurrent', patronId, function(err, ok) {
+            if (err) throw err;
+            if (!ok) return cb(null, 1);
 
-	    return cb(null, 0);
-	});
+            return cb(null, 0);
+        });
     });
 };
 /**
@@ -150,12 +153,18 @@ var addCreatorPatron = function addCreatorPatron(creatorId, patronId, cb) {
 var addPatreonCreator = function addPatreonCreator(creatorId, cb) {
     red.GET('patreon:' + creatorId, function(err, value) {
         if (err) throw err;
-        if (value != null) return cb(null, {status: 1, message: 'creator already exists'});
-        
+        if (value != null) return cb(null, {
+            status: 1,
+            message: 'creator already exists'
+        });
+
         red.SADD('admin:patreon:creators', creatorId);
         red.SET('patreon:' + creatorId, moment().format());
-        
-        return cb(null, {status: 0, message: 'OK'});
+
+        return cb(null, {
+            status: 0,
+            message: 'OK'
+        });
     });
 };
 /**
@@ -166,9 +175,9 @@ var addPatreonCreator = function addPatreonCreator(creatorId, cb) {
  * @param {string} response.status - non-zero if problems
  * @param {string} response.type - 'new' or 'renew' which indicates the patron type
  */
- 
- 
- 
+
+
+
 
 /**
  * after the initial crawl, this runs for every patron.
@@ -184,35 +193,35 @@ var logCreatorPatron = function logCreatorPatron(creatorId, patronId, cb) {
     getCreatorPatronType(creatorId, patronId, function(err, type) {
         if (err) throw err;
 
-	response.type = type; // 'new', 'renew' or '0' (0 is patron that's not a new detection)
+        response.type = type; // 'new', 'renew' or '0' (0 is patron that's not a new detection)
 
-	// only add to set if they aren't already in the patronsCurrent set
+        // only add to set if they aren't already in the patronsCurrent set
 
-	// if patron is brand new ('new') add to both sets
-	if (type == 'new') {
-	    addCreatorPatron(creatorId, patronId, function(err, code) {
-		if (err) return cb(err);
-		if (code !== 0) return cb(new Error('couldnt add patron to the sets'));
-		
-		response.status = 0;
-		return cb(null, response);
-	    });
-	}
+        // if patron is brand new ('new') add to both sets
+        if (type == 'new') {
+            addCreatorPatron(creatorId, patronId, function(err, code) {
+                if (err) return cb(err);
+                if (code !== 0) return cb(new Error('couldnt add patron to the sets'));
 
-	// if patron is returning ('renew') add to patronsCurrent set
-	else if (type == 'renew') {
-            red.SADD('patreon:' + creatorId + ':patronsCurrent', patronId, function(err) {
-		if (err) return cb(err);
-		response.status = 0;
-		return cb(null, response);		
+                response.status = 0;
+                return cb(null, response);
             });
-	}
-	
-	// if patron has already been processed (0) do nothing
-	else {
-	    response.status = 0;
-	    return cb(null, response);
-	}
+        }
+
+        // if patron is returning ('renew') add to patronsCurrent set
+        else if (type == 'renew') {
+            red.SADD('patreon:' + creatorId + ':patronsCurrent', patronId, function(err) {
+                if (err) return cb(err);
+                response.status = 0;
+                return cb(null, response);
+            });
+        }
+
+        // if patron has already been processed (0) do nothing
+        else {
+            response.status = 0;
+            return cb(null, response);
+        }
     });
 };
 /**
@@ -237,7 +246,7 @@ var logCreatorPatron = function logCreatorPatron(creatorId, patronId, cb) {
  * @param {onGeneratedCallback} cb
  */
 var generateUserId = function generateUserId(cb) {
-    
+
     function genString() {
         return Math.random().toString(22).slice(2, 22).toUpperCase();
     }

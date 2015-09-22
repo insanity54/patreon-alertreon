@@ -3,6 +3,7 @@ var path = require('path');
 var app = require(path.join('..', 'lib', 'server'));
 var request = require('supertest');
 
+
 //var app = require(path.join('..', 'index')).app;
 //var server = require(path.join('..', 'index')).server;
 
@@ -22,6 +23,18 @@ describe('API', function() {
                 if (err) throw err;
             });
     });
-
+    
+    describe('Alert links', function(done) {
+        
+        it('should return a page for obs alerts', function(done) {
+            request(app)
+                .get('/alerts/CC150K761CCDDIH00JI')
+                .expect('Content-Type', /html/)
+                .expect(200, done)
+                .end(function(err, res) {
+                    if (err) throw err;
+                });
+        });
+    });
 
 });

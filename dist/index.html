@@ -4,58 +4,39 @@
 <head>
   <meta charset="utf-8">
   <title>Alertreon</title>
-  <link rel="stylesheet" href="todos.css"/>
+  <link rel="stylesheet" href="/todos.css"/>
+  <link rel="stylesheet" href="/styles/loading.css"/>
 </head>
 
 <body>
+  <noscript><h1>Alertreon requires javascript</h1></noscript>
+  <div id="spinner"></div>
 
-  <div id="todoapp">
 
+
+
+
+  <!-- Templates -->
+  <script type="text/template" id="layout-template">
+    <div id="todoapp">
+      <p>LAYOUT TEMPLATE</p>
+      <div id="input"></div>
+      <div id="item"></div>
+    </div>
+    <div id="credits">
+      Created with <img src="img/heart.png" alt="love"></img> by
+      <br />
+      <a href="http://grimtech.net/about">Chris Grimmett</a>.
+    </div>
+  </script>
+  
+  <script type="text/template" id="input-template">
     <header>
       <h1>Alertreon</h1>
       <p id="description">An easy way to generate a twitch.tv alert when someone pledges to your Patreon page</p>
       <input id="new-todo" type="text" placeholder="Enter your Patreon username">
     </header>
-
-    <section id="main">
-      <ul id="todo-list"></ul>
-    </section>
-
-    <footer>
-      <a id="clear-completed">Clear completed</a>
-      <div id="todo-count"></div>
-    </footer>
-
-  </div>
-
-  <div id="instructions">
-    
-  </div>
-
-  <div id="credits">
-    Created with <img src="img/heart.png" alt="love"></img> by
-    <br />
-    <a href="http://grimtech.net/about">Chris Grimmett</a>.
-  </div>
-
-
-
-  <script src="./vendor/json2/json2.js"></script>
-  <script src="./vendor/jquery/dist/jquery.js"></script>
-  <script src="./vendor/underscore/underscore.js"></script>
-  <script src="./vendor/backbone/backbone.js"></script>
-  <script src="/socket.io/socket.io.js"></script>
-  <script>
-    window.socket = io('//' + window.location.hostname);
   </script>
-
-  <script src="./vendor/backbone.iobind/dist/backbone.iobind.js"></script>
-  <script src="./vendor/backbone.iobind/dist/backbone.iosync.js"></script>
-  <script src="./js/todos.js"></script>
-  
-  
-
-  <!-- Templates -->
 
   <script type="text/template" id="item-template">
     <div class="view">
@@ -70,11 +51,29 @@
     <div class="status"><%= status %></div>
     <% if (id) { %>
       Your alert link
-      <a class="alert-link" href="//<%= window.location.hostname %>/patreon/alerts/<%= id %>"><%= window.location.hostname %>/patreon/alert/<%= id %></a>
+      <a class="alert-link" href="//<%= window.location.hostname %>/alerts/<%= id %>"><%= window.location.hostname %>/alert/<%= id %></a>
     <% } else { %>
       Generating alert link...
     <% } %>
   </script>
+  
+
+  <script src="/vendor/json2/json2.js"></script>
+  <script src="/vendor/jquery/dist/jquery.js"></script>
+  <script src="/vendor/underscore/underscore.js"></script>
+  <script src="/vendor/backbone/backbone.js"></script>
+  <script src="/vendor/marionette/lib/backbone.marionette.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    window.socket = io('//' + window.location.hostname);
+  </script>
+
+  <script src="/vendor/backbone.iobind/dist/backbone.iobind.js"></script>
+  <script src="/vendor/backbone.iobind/dist/backbone.iosync.js"></script>
+  <script src="/vendor/spin.js/spin.js"></script>
+  <script src="/js/todos.js"></script>
+  <script src="/js/loading.js"></script>
+
 
   </body>
 </html>
