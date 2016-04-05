@@ -2,6 +2,9 @@
 patreon twitch.tv / OBS alerts
 
 
+**ABANDONED PROJECT.** If you're looking for a way to get patreon pledge alerts in your TwitchAlerts, check out http://twitch.center/patreon
+
+
 
 ## todo: 
 
