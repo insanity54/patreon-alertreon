@@ -1,0 +1,13 @@
+{
+  "groups": {
+    "default": {
+      "packages": [
+        "dist/vendor/backbone.iobind/example/package.json",
+        "dist/vendor/backbone.iobind/package.json",
+        "dist/vendor/marionette/package.json",
+        "dist/vendor/socketio-client/package.json",
+        "package.json"
+      ]
+    }
+  }
+}
