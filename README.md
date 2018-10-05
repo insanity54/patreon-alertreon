@@ -1,4 +1,7 @@
 # patreon-alertreon
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/insanity54/patreon-alertreon.svg)](https://greenkeeper.io/)
+
 patreon twitch.tv / OBS alerts
 
 
